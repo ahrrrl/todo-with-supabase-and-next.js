@@ -1,5 +1,6 @@
-import { createServerClient } from "@supabase/ssr";
-import { type NextRequest, NextResponse } from "next/server";
+import { AUTH_ROUTES, DASHBOARD_ROUTE, GUEST_ROUTES } from '@/constant/routes';
+import { createServerClient } from '@supabase/ssr';
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const updateSession = async (request: NextRequest) => {
   // This `try/catch` block is only here for the interactive tutorial.
@@ -22,17 +23,17 @@ export const updateSession = async (request: NextRequest) => {
           },
           setAll(cookiesToSet) {
             cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value),
+              request.cookies.set(name, value)
             );
             response = NextResponse.next({
               request,
             });
             cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options),
+              response.cookies.set(name, value, options)
             );
           },
         },
-      },
+      }
     );
 
     // This will refresh session if expired - required for Server Components
@@ -40,12 +41,16 @@ export const updateSession = async (request: NextRequest) => {
     const user = await supabase.auth.getUser();
 
     // protected routes
-    if (request.nextUrl.pathname.startsWith("/protected") && user.error) {
-      return NextResponse.redirect(new URL("/sign-in", request.url));
+    if (request.nextUrl.pathname.startsWith(DASHBOARD_ROUTE) && user.error) {
+      return NextResponse.redirect(new URL(AUTH_ROUTES.SIGN_IN, request.url));
+    }
+    
+    if (request.nextUrl.pathname === '/' && !user.error) {
+      return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
     }
 
-    if (request.nextUrl.pathname === "/" && !user.error) {
-      return NextResponse.redirect(new URL("/protected", request.url));
+    if (GUEST_ROUTES.includes(request.nextUrl.pathname) && !user.error) {
+      return NextResponse.redirect(new URL(DASHBOARD_ROUTE, request.url));
     }
 
     return response;

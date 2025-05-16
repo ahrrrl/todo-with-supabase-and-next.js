@@ -20,10 +20,13 @@ export function TodoEditor({ data }: Props) {
   const [content, setContent] = useState(
     data.content || { type: 'doc', content: [] }
   );
+  const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
   const handleSave = async () => {
+    setIsSaving(true);
     const { error } = await editTodo({ title, content, id: data.id });
+    setIsSaving(false);
     if (!error) {
       toast.success('수정되었습니다.');
       router.push(`${DASHBOARD_ROUTES.VIEW_TODO}/${data.id}`);
@@ -39,7 +42,11 @@ export function TodoEditor({ data }: Props) {
         placeholder={'제목을 입력하세요'}
       />
       <TiptapEditor content={content} onChange={setContent} />
-      <Button onClick={handleSave} className='mt-4 px-4 py-2  rounded'>
+      <Button
+        onClick={handleSave}
+        className='mt-4 px-4 py-2  rounded'
+        disabled={isSaving}
+      >
         저장하기
       </Button>
     </>

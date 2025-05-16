@@ -6,6 +6,7 @@ import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { signInSchema } from '@/zod/schema';
 import { AUTH_ROUTES, DASHBOARD_ROUTE } from '@/constant/routes';
+import { revalidatePath } from 'next/cache';
 
 export const signUpAction = async (_: unknown, formData: FormData) => {
   const data = {
@@ -49,13 +50,13 @@ export const signInAction = async (_: unknown, formData: FormData) => {
 
   const supabase = await createClient();
 
-  const { error } = await supabase.auth.signInWithPassword(data);
+  const { data: userData, error } = await supabase.auth.signInWithPassword(data);
 
   if (error) {
     return { errorMessage: error?.message };
   }
 
-  return redirect(DASHBOARD_ROUTE);
+  return { user: userData.user };
 };
 
 export const forgotPasswordAction = async (formData: FormData) => {

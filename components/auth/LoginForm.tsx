@@ -10,11 +10,14 @@ import { TSignInForm, useFormValidate } from './useFormVaildate';
 import { signInSchema } from '@/zod/schema';
 import { ErrorMessage } from './ErrorMessage';
 import toast from 'react-hot-toast';
-import { AUTH_ROUTES } from '@/constant/routes';
+import { AUTH_ROUTES, DASHBOARD_ROUTE } from '@/constant/routes';
+import useUserStore from '@/zustand/userStore';
+import { redirect } from 'next/navigation';
 
 export function LoginForm() {
   const [state, action, isPanding] = useActionState(signInAction, undefined);
   const { errors, validateField } = useFormValidate<TSignInForm>(signInSchema);
+  const setUser = useUserStore((state) => state.setUser);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -24,6 +27,10 @@ export function LoginForm() {
   useEffect(() => {
     if (state?.errorMessage) {
       toast.error(state.errorMessage);
+    }
+    if (state?.user) {
+      setUser(state.user);
+      redirect(DASHBOARD_ROUTE);
     }
   }, [state]);
 

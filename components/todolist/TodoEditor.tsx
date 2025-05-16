@@ -6,21 +6,14 @@ import TiptapEditor from './TiptapEditor';
 import { useRouter } from 'next/navigation';
 import { DASHBOARD_ROUTES } from '@/constant/routes';
 import { editTodo } from '@/app/actions/todos';
+import { Database } from '@/database.types';
+import toast from 'react-hot-toast';
 
 interface Props {
-  data: {
-    content: any | null;
-    created_at: string | null;
-    description: string | null;
-    due_date: string | null;
-    id: number;
-    priority: string | null;
-    status: string | null;
-    title: string;
-    updated_at: string | null;
-    user_id: string | null;
-  };
+  data: Todo;
 }
+
+type Todo = Database['public']['Tables']['todolist']['Row'];
 
 export function TodoEditor({ data }: Props) {
   const [title, setTitle] = useState(data.title);
@@ -32,6 +25,7 @@ export function TodoEditor({ data }: Props) {
   const handleSave = async () => {
     const { error } = await editTodo({ title, content, id: data.id });
     if (!error) {
+      toast.success('수정되었습니다.');
       router.push(`${DASHBOARD_ROUTES.VIEW_TODO}/${data.id}`);
     }
   };

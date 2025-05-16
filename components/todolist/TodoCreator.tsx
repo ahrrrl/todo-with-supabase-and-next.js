@@ -4,10 +4,10 @@ import { createTodo } from '@/app/actions/todos';
 import TiptapEditor from '@/components/todolist/TiptapEditor';
 import { Button } from '@/components/ui/button';
 import { DASHBOARD_ROUTES } from '@/constant/routes';
-import { createClient } from '@/utils/supabase/client';
 import useUserStore from '@/zustand/userStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 
 export function TodoCreator() {
   const [title, setTitle] = useState('');
@@ -17,7 +17,10 @@ export function TodoCreator() {
 
   const handleCreate = async () => {
     const data = await createTodo({ title, content, user_id: user!.id });
-    if (data) router.push(`${DASHBOARD_ROUTES.VIEW_TODO}/${data.id}`);
+    if (data) {
+      toast.success('생성되었습니다.');
+      router.push(`${DASHBOARD_ROUTES.VIEW_TODO}/${data.id}`);
+    }
   };
 
   return (
